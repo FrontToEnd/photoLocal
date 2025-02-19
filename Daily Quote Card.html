@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>每日金句卡片</title>
+  <link rel='stylesheet' href='https://unpkg.com/@chinese-fonts/hwmct@2.0.1/dist/%E6%B1%87%E6%96%87%E6%98%8E%E6%9C%9D%E4%BD%93/result.css' />
+  <style>
+    :root {
+      --primary-color: 76, 175, 80;
+      --bg-gradient-start: #ffffff;
+      --bg-gradient-end: #f8faf8;
+      --circle-opacity-1: 0.15;
+      --circle-opacity-2: 0.05;
+      --circle-opacity-3: 0.12;
+      --circle-opacity-4: 0.04;
+      --border-opacity-1: 0.3;
+      --border-opacity-2: 0.1;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f5f5f5;
+      font-family: 'Huiwen-mincho', serif;
+    }
+
+    .card {
+      position: relative;
+      width: 800px;
+      height: 100vh;
+      background: linear-gradient(to bottom, var(--bg-gradient-start), var(--bg-gradient-end));
+      padding: 40px;
+      box-sizing: border-box;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .background-circle {
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 600px;
+      height: 600px;
+      background: linear-gradient(135deg, 
+        rgba(var(--primary-color), var(--circle-opacity-1)),
+        rgba(var(--primary-color), var(--circle-opacity-2)));
+      border-radius: 50%;
+      filter: blur(20px);
+    }
+
+    .background-circle-2 {
+      position: absolute;
+      bottom: -150px;
+      right: -150px;
+      width: 700px;
+      height: 700px;
+      background: linear-gradient(225deg, 
+        rgba(var(--primary-color), var(--circle-opacity-3)),
+        rgba(var(--primary-color), var(--circle-opacity-4)));
+      border-radius: 50%;
+      filter: blur(25px);
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1px;
+      background: linear-gradient(135deg, 
+        rgba(var(--primary-color), var(--border-opacity-1)),
+        rgba(var(--primary-color), var(--border-opacity-2)));
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .date-container {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      text-align: right;
+      color: #333;
+    }
+
+    .date-number {
+      font-size: 72px;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .date-month {
+      font-size: 24px;
+      margin-top: 10px;
+    }
+
+    .date-weekday {
+      font-size: 20px;
+      margin-top: 5px;
+      color: #444;
+    }
+
+    .text-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 60px;
+      margin-top: 100px;
+    }
+
+    .quote-text {
+      font-size: 36px;
+      color: #333;
+      line-height: 1.8;
+      letter-spacing: 3px;
+    }
+
+    .quote-author {
+      text-align: right;
+      font-size: 24px;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      right: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .footer-text {
+      display: flex;
+      align-items: center;
+      color: #333;
+      font-size: 18px;
+    }
+
+    .footer-text .icon {
+      margin-right: 10px;
+    }
+
+    .qr-code {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .qr-code img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .birds {
+      position: absolute;
+      top: 120px;
+      left: 40px;
+      width: 200px;
+      height: 100px;
+      opacity: 0.8;
+    }
+
+    .bird {
+      position: absolute;
+      width: 20px;
+      height: 10px;
+      background: #fff;
+      clip-path: polygon(0% 50%, 50% 0%, 100% 50%, 50% 100%);
+    }
+
+    .bird:nth-child(1) { top: 20%; left: 10%; }
+    .bird:nth-child(2) { top: 40%; left: 30%; }
+    .bird:nth-child(3) { top: 10%; left: 50%; }
+    .bird:nth-child(4) { top: 50%; left: 70%; }
+    .bird:nth-child(5) { top: 30%; left: 90%; }
+
+    .theme-controller {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      max-width: 200px;
+    }
+
+    .theme-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .theme-btn.active {
+      border-color: #333;
+    }
+
+    .control-panel {
+      position: fixed;
+      left: 20px;
+      top: 200px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      z-index: 1000;
+    }
+
+    .control-panel .input-group {
+      margin-bottom: 15px;
+    }
+
+    .control-panel label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .control-panel textarea,
+    .control-panel input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: inherit;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .control-panel textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .control-panel button {
+      background: rgb(var(--primary-color));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+      transition: opacity 0.3s;
+    }
+
+    .control-panel button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-controller" id="themeController"></div>
+  
+  <div class="control-panel">
+    <div class="input-group">
+      <label>金句内容</label>
+      <textarea id="quoteInput">路要靠自己走出来，
+自己走出来的路是最可靠的路。</textarea>
+    </div>
+    <div class="input-group">
+      <label>作者</label>
+      <input type="text" id="authorInput" value="邓小平">
+    </div>
+    <button onclick="updateQuote()">更新金句</button>
+  </div>
+
+  <div class="card">
+    <div class="background-circle"></div>
+    <div class="background-circle-2"></div>
+    <div class="birds">
+      <div class="bird"></div>
+      <div class="bird"></div>
+      <div class="bird"></div>
+      <div class="bird"></div>
+      <div class="bird"></div>
+    </div>
+
+    <div class="date-container">
+      <div id="dateNumber" class="date-number"></div>
+      <div id="dateMonth" class="date-month"></div>
+      <div id="dateWeekday" class="date-weekday"></div>
+    </div>
+
+    <div class="text-content">
+      <div class="quote-text" id="quoteText">
+        路要靠自己走出来，<br>
+        自己走出来的路是最可靠的路。
+      </div>
+      <div class="quote-author" id="quoteAuthor">—— 邓小平</div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-text">
+        <span class="icon">💡</span>
+        今天需要这句话
+      </div>
+      <div class="qr-code">
+        <img src="https://raw.githubusercontent.com/FrontToEnd/photoLocal/1bddbc2b029729249d79269e19189610c6d90e7c/qrcode.jpg" alt="QR Code">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 主题配置
+    const themes = [
+      {
+        name: 'green',
+        title: '清新绿',
+        color: [76, 175, 80],
+        gradient: ['#ffffff', '#f8faf8'],
+        previewColor: 'rgb(76, 175, 80)'
+      },
+      {
+        name: 'sunset',
+        title: '日落',
+        color: [250, 101, 133],
+        gradient: ['#ffffff', '#fff5f7'],
+        previewColor: '#FD6585'
+      },
+      {
+        name: 'ocean',
+        title: '海洋',
+        color: [67, 203, 255],
+        gradient: ['#ffffff', '#f5fbff'],
+        previewColor: '#43CBFF'
+      },
+      {
+        name: 'lavender',
+        title: '薰衣草',
+        color: [206, 159, 252],
+        gradient: ['#ffffff', '#faf5ff'],
+        previewColor: '#CE9FFC'
+      },
+      {
+        name: 'sunshine',
+        title: '阳光',
+        color: [253, 235, 113],
+        gradient: ['#ffffff', '#fffdf5'],
+        previewColor: '#FDEB71'
+      },
+      {
+        name: 'cherry',
+        title: '樱花',
+        color: [246, 206, 236],
+        gradient: ['#ffffff', '#fff5fb'],
+        previewColor: '#F6CEEC'
+      },
+      {
+        name: 'mint',
+        title: '薄荷',
+        color: [144, 247, 236],
+        gradient: ['#ffffff', '#f5fffd'],
+        previewColor: '#90F7EC'
+      },
+      {
+        name: 'royal',
+        title: '皇室紫',
+        color: [115, 103, 240],
+        gradient: ['#ffffff', '#f5f5ff'],
+        previewColor: '#7367F0'
+      },
+      {
+        name: 'coral',
+        title: '珊瑚',
+        color: [254, 182, 146],
+        gradient: ['#ffffff', '#fff7f5'],
+        previewColor: '#FEB692'
+      },
+      {
+        name: 'sky',
+        title: '天空蓝',
+        color: [171, 220, 255],
+        gradient: ['#ffffff', '#f5faff'],
+        previewColor: '#ABDCFF'
+      },
+      {
+        name: 'golden',
+        title: '金色',
+        color: [248, 216, 0],
+        gradient: ['#ffffff', '#fffdf5'],
+        previewColor: '#F8D800'
+      },
+      {
+        name: 'rose',
+        title: '玫瑰',
+        color: [249, 119, 148],
+        gradient: ['#ffffff', '#fff5f7'],
+        previewColor: '#F97794'
+      },
+      {
+        name: 'aqua',
+        title: '碧海',
+        color: [50, 229, 231],
+        gradient: ['#ffffff', '#f5feff'],
+        previewColor: '#32E5E7'
+      },
+      {
+        name: 'amethyst',
+        title: '紫晶',
+        color: [159, 68, 211],
+        gradient: ['#ffffff', '#f8f5ff'],
+        previewColor: '#9F44D3'
+      },
+      {
+        name: 'forest',
+        title: '森林',
+        color: [129, 251, 184],
+        gradient: ['#ffffff', '#f5fff9'],
+        previewColor: '#81FBB8'
+      },
+      {
+        name: 'twilight',
+        title: '暮光',
+        color: [151, 171, 255],
+        gradient: ['#ffffff', '#f5f7ff'],
+        previewColor: '#97ABFF'
+      }
+    ];
+
+    // 更新日期
+    function updateDate() {
+      const now = new Date();
+      const day = now.getDate();
+      const monthNames = ['一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二'];
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+
+      document.getElementById('dateNumber').textContent = day;
+      document.getElementById('dateMonth').textContent = monthNames[now.getMonth()] + '月';
+      document.getElementById('dateWeekday').textContent = '星期' + weekDays[now.getDay()];
+    }
+
+    // 应用主题
+    function applyTheme(theme) {
+      const root = document.documentElement;
+      root.style.setProperty('--primary-color', theme.color.join(', '));
+      root.style.setProperty('--bg-gradient-start', theme.gradient[0]);
+      root.style.setProperty('--bg-gradient-end', theme.gradient[1]);
+
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.theme === theme.name) {
+          btn.classList.add('active');
+        }
+      });
+    }
+
+    // 创建主题控制器
+    function createThemeController() {
+      const controller = document.getElementById('themeController');
+      themes.forEach(theme => {
+        const btn = document.createElement('div');
+        btn.className = 'theme-btn';
+        btn.title = theme.title;
+        btn.dataset.theme = theme.name;
+        btn.style.backgroundColor = theme.previewColor;
+        btn.onclick = () => applyTheme(theme);
+        controller.appendChild(btn);
+      });
+    }
+
+    // 更新金句
+    function updateQuote() {
+      const quoteText = document.getElementById('quoteInput').value;
+      const author = document.getElementById('authorInput').value;
+      
+      document.getElementById('quoteText').innerHTML = quoteText.replace(/\n/g, '<br>');
+      document.getElementById('quoteAuthor').textContent = `—— ${author}`;
+    }
+
+    // 初始化
+    updateDate();
+    createThemeController();
+    applyTheme(themes[0]);
+  </script>
+</body>
+</html>
